@@ -107,6 +107,10 @@ def PIDloop():
         float d = 0
         float t = 0
         float final = 0
+        dc_pwm1 = GPIO.PWM(PWMA,50)
+        dc_pwm2 = GPIO.PWM(PWMB,50)
+        dc_pwm1.start(0)
+        dc_pwm2.start(0)
     while true:
         error = target - pos
         if time = 0
@@ -115,9 +119,30 @@ def PIDloop():
         i += error*t
         d = (error-prevError)/0.005
         final = kp*p + ki*i + kd*d
+        if final>0:
+            GPIO.output(AIN1.HIGH)
+            GPIO.output(AIN2.LOW)
+            GPIO.output(BIN1.HIGH)
+            GPIO.output(BIN2.LOW)
+        if final<0:
+            GPIO.output(AIN1.LOW)
+            GPIO.output(AIN2.HIGH)
+            GPIO.output(BIN1.LOW)
+            GPIO.output(BIN2.HIGH)
+        duty = abs(final)
+        if 0<duty<100:
+            dc_pwm1.ChangeDutyCycle(duty)
+            dc_pwm2.ChangeDutyCycle(duty)
+        if duty<0
+            dc_pwm1.ChangeDutyCycle(0)
+            dc_pwm2.ChangeDutyCycle(0)
+        if duty>100
+            dc_pwm1.ChangeDutyCycle(100)
+            dc_pwm2.ChangeDutyCycle(100)
+
         prevError = error
         t+=0.005
         time.sleep(0.005)
 
 PIDthread = threading.Thread(target=PIDloop)
-IMUthread = threading.Thread(target=IMUloop)
+IMUthread = threading.Thread(target=sensorloop)
