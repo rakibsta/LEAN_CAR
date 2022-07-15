@@ -97,6 +97,12 @@ def sensorloop():
 
         time.sleep(1)
 
+def sign(num):
+    if num<0:
+        return -1
+    else
+        return 1
+
 def PIDloop():
     float target = 0.3
     float pos = 0
@@ -113,7 +119,7 @@ def PIDloop():
 
     float target_T = 0
     float theta = 0
-    float kp_T = 0.2
+    float kp_T = 0
     float ki_T = 0
     float kd_T = 0
     float error_T = 0
@@ -157,8 +163,8 @@ def PIDloop():
             GPIO.output(BIN1.LOW)
             GPIO.output(BIN2.HIGH)
 
-        duty1 = abs(final) + final_T
-        duty2 = abs(final) - final_T
+        duty1 = abs(final) + sign(final_T)*final_T
+        duty2 = abs(final) - sign(final_T)*final_T
 
         dc_pwm1.ChangeDutyCycle(limit(duty, 0, 100))
         dc_pwm2.ChangeDutyCycle(limit(duty, 0, 100))
@@ -168,4 +174,6 @@ def PIDloop():
         time.sleep(0.005)
 
 PIDthread = threading.Thread(target=PIDloop)
+PIDthread.start()
 IMUthread = threading.Thread(target=sensorloop)
+IMUthread.start()
