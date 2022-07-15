@@ -74,7 +74,14 @@ MPU_Init()
 def limit(num, minimum, maximum):
     return max(min(num, maximum), minimum)
 
+actuation_power = []
+computation_power = []
+speed = []
+timestamp_s = []
+timestamp_m = []
+
 def sensorloop():
+    time = 0
     while true:
         acc_x = read_raw_data(ACCEL_XOUT_H)  # Read Accelerometer raw value
         acc_y = read_raw_data(ACCEL_YOUT_H)
@@ -92,10 +99,12 @@ def sensorloop():
         Gy = gyro_y/131.0
         Gz = gyro_z/131.0
 
-        actuation_power = dc_cur.power()
-        computation_power = pi_cur.power()
+        actuation_power += [dc_cur.power()]
+        computation_power += [pi_cur.power()]
+        timestamps_s += [time]
 
-        time.sleep(1)
+        time.sleep(5)
+        time += 0.005
 
 def sign(num):
     if num<0:
@@ -106,6 +115,7 @@ def sign(num):
 def PIDloop():
     float target = 0.3
     float pos = 0
+    float prevPos = 0
     float kp = 0.2
     float ki = 0
     float kd = 0
@@ -140,6 +150,7 @@ def PIDloop():
         error_T = target_T - theta
         if t = 0:
             prevError_T = errorT
+            prevPos = pos
         p_t = kp_T*error_T
         i_T += error_T*t
         d_T = (error_T-prevError_T)/0.005
@@ -151,6 +162,7 @@ def PIDloop():
         p = kp*error
         i += error*t
         d = (error-prevError)/0.005
+        speed += [d]
         final = kp*p + ki*i + kd*d
         if final > 0:
             GPIO.output(AIN1.HIGH)
@@ -166,10 +178,11 @@ def PIDloop():
         duty1 = abs(final) + sign(final_T)*final_T
         duty2 = abs(final) - sign(final_T)*final_T
 
-        dc_pwm1.ChangeDutyCycle(limit(duty, 0, 100))
-        dc_pwm2.ChangeDutyCycle(limit(duty, 0, 100))
+        dc_pwm1.ChangeDutyCycle(limit(duty1, 0, 100))
+        dc_pwm2.ChangeDutyCycle(limit(duty2, 0, 100))
 
         prevError = error
+        timestamps_m += [t]
         t += 0.005
         time.sleep(0.005)
 
