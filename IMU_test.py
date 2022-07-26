@@ -1,6 +1,8 @@
 import RPi.GPIO as GPIO
 import smbus
 from time import sleep
+import matplotlib.pyplot as plt
+import numpy as np
 
 B1B = 25
 A1B = 23
@@ -41,7 +43,7 @@ def read_raw_data(addr):
     value = ((high << 8) | low)
     if(value > 32768):
         value = value - 65536
-        return value
+    return value
 
 bus = smbus.SMBus(1)
 Device_Address = 0x68
@@ -50,6 +52,15 @@ MPU_Init()
 print("1helo :D")
 def sensorloop():
     time = 0
+
+    Ax_list = []
+    Ay_list = []
+    Az_list = []
+    Gx_list = []
+    Gy_list = []
+    Gz_list = []
+    t=np.arange(0.0, 2.0, 0.05)
+
     print("2helo :D")
     x = 0
     y = 0
@@ -57,7 +68,7 @@ def sensorloop():
     Dx = 0
     Dy = 0
     Dz = 0
-    while 1:
+    for i in range(40):
         print("3helo :D")
         acc_x = read_raw_data(ACCEL_XOUT_H)  # Read Accelerometer raw value
         acc_y = read_raw_data(ACCEL_YOUT_H)
@@ -75,21 +86,41 @@ def sensorloop():
         y += Ay*9.8*0.005
         z += Az*9.8*0.005
 
-        #Gx = float(gyro_x)/131.0
-        #Gy = float(gyro_y)/131.0
-        #Gz = float(gyro_z)/131.0
+        Gx = float(gyro_x)/131.0
+        Gy = float(gyro_y)/131.0
+        Gz = float(gyro_z)/131.0
 
-        #Dx += Gx*0.005
-        #Dy += Gy*0.005
-        #Dz += Gz*0.005
+        Dx += Gx*0.005
+        Dy += Gy*0.005
+        Dz += Gz*0.005
 
-#        actuation_power += [dc_cur.power()]
-#        computation_power += [pi_cur.power()]
-        #timestamps_s += [time]
+        Ax_list += [Ax]
+        Ay_list += [Ay]
+        Az_list += [Az]
 
-        sleep(0.25)
-        #time += 1
+        Gx_list += [Gx]
+        Gy_list += [Gy]
+        Gz_list += [Gz]
+
+        sleep(0.05)
+        time += 50
 
         print("Ax:", str(Ax), " Ay:", str(Ay), " Az:", str(Az))
-        #print("Gx:", str(Ax), " Gy:", str(Gy), " Az:", str(Gz))
+        print("Gx:", str(Ax), " Gy:", str(Gy), " Az:", str(Gz))
+    figure, data = plt.subplots(2,3)
+
+    data[0,0].plot(t, Ax_list)
+    data[0,0].set_title("Ax vs t(ms)")
+    data[0,1].plot(t, Ay_list)
+    data[0,1].set_title("Ay vs t(ms)")
+    data[0,2].plot(t, Az_list)
+    data[0,2].set_title("Az vs t(ms)")
+    data[1,0].plot(t, Gx_list)
+    data[1,0].set_title("Gx vs t(ms)")
+    data[1,1].plot(t, Gy_list)
+    data[1,1].set_title("Gy vs t(ms)")
+    data[1,2].plot(t, Gz_list)
+    data[1,2].set_title("Gz vs t(ms)")
+    plt.show()
+
 sensorloop()
