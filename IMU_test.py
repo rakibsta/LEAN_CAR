@@ -67,29 +67,29 @@ def sensorloop():
         gyro_y = read_raw_data(GYRO_YOUT_H)
         gyro_z = read_raw_data(GYRO_ZOUT_H)
 
-        Ax = acc_x/16384.0  # Full scale range +/- 250 degree/C as per sensitivity scale-factor
-        Ay = acc_y/16384.0
-        Az = acc_z/16384.0
+        Ax = float(acc_x)/16384.0  # Full scale range +/- 250 degree/C as per sensitivity scale-factor
+        Ay = float(acc_y)/16384.0
+        Az = float(acc_z)/16384.0
 
         x += Ax*9.8*0.005
         y += Ay*9.8*0.005
         z += Az*9.8*0.005
 
-        Gx = gyro_x/131.0
-        Gy = gyro_y/131.0
-        Gz = gyro_z/131.0
+        #Gx = float(gyro_x)/131.0
+        #Gy = float(gyro_y)/131.0
+        #Gz = float(gyro_z)/131.0
 
-        Dx += Gx*0.005
-        Dy += Gy*0.005
-        Dz += Gz*0.005
+        #Dx += Gx*0.005
+        #Dy += Gy*0.005
+        #Dz += Gz*0.005
 
 #        actuation_power += [dc_cur.power()]
 #        computation_power += [pi_cur.power()]
         #timestamps_s += [time]
 
-        sleep(1)
+        sleep(0.25)
         #time += 1
 
         print("Ax:", str(Ax), " Ay:", str(Ay), " Az:", str(Az))
-        print("Gx:", str(Ax), " Gy:", str(Gy), " Az:", str(Gz))
+        #print("Gx:", str(Ax), " Gy:", str(Gy), " Az:", str(Gz))
 sensorloop()
