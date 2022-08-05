@@ -6,7 +6,7 @@
 
 import RPI.GPIO as GPIO        # GPIO module
 import smbus                   # SMBus module I2C
-from ina219 import INA219      # INA219 module I2C
+from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 from time import sleep
 
 GPIO.setmode(GPIO.BOARD)
